@@ -25,11 +25,6 @@ def load_data():
     url = "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json"
     data = urlopen(url).read().decode()
     obj = json.loads(data)
-
-
-
-
-    
     return obj
 
 
