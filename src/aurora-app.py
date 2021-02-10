@@ -14,6 +14,7 @@ def split_list(lst):
     for row in lst:
         coords.append((row[0], row[1]))
         ratings.append(row[2])
+
     return coords, ratings
 
 
