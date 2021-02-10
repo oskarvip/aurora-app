@@ -1,0 +1,16 @@
+name: Black
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+        
+    - name: Python Blacken
+      uses: piotrpawlaczek/python-blacken@release/stable
+      with:
+        path: src
+        line-length: 81
