@@ -11,9 +11,3 @@ jobs:
         
     - name: Python Blacken
       uses: piotrpawlaczek/python-blacken@release/stable
-      run: |
-        pwd
-        ls
-      with:
-        path: '.'
-        line-length: 81
