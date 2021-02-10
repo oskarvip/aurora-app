@@ -12,5 +12,5 @@ jobs:
     - name: Python Blacken
       uses: piotrpawlaczek/python-blacken@release/stable
       with:
-        path: src
+        path: '/src'
         line-length: 81
