@@ -7,6 +7,7 @@ from scipy import spatial
 st.title("Aurora Predictor app")
 st.write("Predictions are performed using OVATION Prime auroral precipitation model")
 
+st.write("saPredictions are performed using OVATION Prime auroral precipitation modeljdsjffjsdjfdsjfjsdfjsjfsjfjsfjsjfsjfjsfjsjfjsfjsjfsfjsfjsjfjsfjsjfjsfjsjjsjj")
 
 def split_list(lst):
     coords = []
