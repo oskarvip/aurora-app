@@ -4,7 +4,11 @@ from urllib.request import urlopen
 from scipy import spatial
 from os import environ
 from mapbox import Geocoder
-#import folium
+from folium import Map, Marker
+from folium.plugins import HeatMap
+from streamlit_folium import folium_static
+
+# import folium
 
 # Declare constants
 SCANDINAVIA_BBOX = (0.105400, 53.944367, 32.712822, 72.148786)
@@ -16,8 +20,11 @@ if not MAPBOX_ACCESS_TOKEN:
 geocoder = Geocoder()
 
 
-st.title("Aurora Predictor app")
-st.write("Predictions are performed using OVATION Prime auroral precipitation model")
+st.title("Aurora Forecasting App")
+st.write(
+    "Short term forecasts are performed using OVATION Prime auroral precipitation model " 
+    "and describes the probability of observing an aurora directly above a given location"
+)
 # st.write("MAPBOX TOKEN IS: " + str(MAPBOX_ACCESS_TOKEN))
 
 
@@ -60,37 +67,56 @@ def find_closest(position):
     return dist, index
 
 
+def generate_base_map(
+    default_location=[64.9648751621697, 17.6754094331351], default_zoom_start=4
+):
+    base_map = Map(
+        location=default_location, control_scale=True, zoom_start=default_zoom_start
+    )
+    return base_map
+
+
 # Download the aurora predictions and prepare for search
-with st.spinner(text='Getting data...'):
+with st.spinner(text="Getting data..."):
     aurora_data = load_data(AURORA_DATA_URL)
     aurora_coords, aurora_ratings = split_list(aurora_data["coordinates"])
     tree = spatial.KDTree(aurora_coords)
 
+base_map = generate_base_map()
+map_coords = [(row[1], row[0], row[2]) for row in aurora_data["coordinates"]]
+HeatMap(data=map_coords, min_opacity=0, blur=50, radius=10).add_to(base_map)
+
 # Get the users location and convert to coordinates
 st.header("Enter your location")
-position_input = "Kiruna"
-position_query = st.text_input("Enter a place (ex Kiruna)", "Kiruna")
+position_query = st.text_input("Enter a place (ex Kiruna)")
+ret = None
+if position_query:
+    position_properties = forward_geocode(position_query)
+    # st.write(position_properties)
 
-position_properties = forward_geocode(position_query)
-st.write(position_properties)
+    position_coordinates = tuple(reversed(position_properties["center"]))
 
-position_coordinates = tuple(reversed(position_properties["center"]))
-st.write(position_coordinates)
-#st.write(tuple(reversed(position_coordinates)))
+    dist, index = tree.query(position_coordinates)
+    ret = {
+        "query": position_query,
+        "position_name": position_properties["place_name"],
+        "position_coordinates": position_coordinates,
+        "distance": dist,
+        "aurora_coords": aurora_coords[index],
+        "observation_time": aurora_data["Observation Time"],
+        "forecast_time": aurora_data["Forecast Time"],
+        "aurora_probability": str(aurora_ratings[index]) + "%",
+    }
 
-dist, index = tree.query(position_coordinates)
-ret = {
-    "query": position_query,
-    "query_result": position_properties["place_name"],
-    "position": position_coordinates,
-    "distance": dist,
-    "aurora_coords": aurora_coords[index],
-    "observation_time": aurora_data["Observation Time"],
-    "forecast_time": aurora_data["Forecast Time"],
-    "aurora_probability": str(aurora_ratings[index]) + "%",
-}
-st.write(
-    "Forecasts should be interpreted as the probability of observing an aurora "
-    "directly above you up to an hour in the future"
-)
-st.write(ret)
+    popup = "Aurora Probability: {}".format(ret["aurora_probability"])
+    Marker(position_coordinates, popup=popup, tooltip=ret["position_name"]).add_to(
+        base_map
+    )
+    st.subheader("Aurora probability in {}".format(ret["position_name"]))
+    st.write("Aurora Probability: {}".format(ret["aurora_probability"]))
+    st.write("Forecast Time: {}".format(ret["forecast_time"]))
+    st.write("Observation Time: {}".format(ret["observation_time"]))
+
+folium_static(base_map)
+# if ret:
+# st.write(ret)

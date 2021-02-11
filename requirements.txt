@@ -1,3 +1,5 @@
 streamlit
 scipy
 mapbox
+folium
+streamlit-folium
