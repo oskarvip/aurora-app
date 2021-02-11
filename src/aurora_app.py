@@ -22,8 +22,9 @@ geocoder = Geocoder()
 
 st.title("Aurora Forecasting App")
 st.write(
-    "Short term forecasts are performed using OVATION Prime auroral precipitation model " 
-    "and describes the probability of observing an aurora directly above a given location"
+    "Short term forecasts are performed using OVATION Prime auroral precipitation "
+    "model. Results should be interpreted as the probability of observing an aurora "
+    "directly above a given location"
 )
 # st.write("MAPBOX TOKEN IS: " + str(MAPBOX_ACCESS_TOKEN))
 
@@ -112,6 +113,8 @@ if position_query:
     Marker(position_coordinates, popup=popup, tooltip=ret["position_name"]).add_to(
         base_map
     )
+    base_map.location = position_coordinates
+    #base_map.default_zoom_start = 8
     st.subheader("Aurora probability in {}".format(ret["position_name"]))
     st.write("Aurora Probability: {}".format(ret["aurora_probability"]))
     st.write("Forecast Time: {}".format(ret["forecast_time"]))
