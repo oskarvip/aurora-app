@@ -113,8 +113,8 @@ if position_query:
     Marker(position_coordinates, popup=popup, tooltip=ret["position_name"]).add_to(
         base_map
     )
+
     base_map.location = position_coordinates
-    #base_map.default_zoom_start = 8
     st.subheader("Aurora probability in {}".format(ret["position_name"]))
     st.write("Aurora Probability: {}".format(ret["aurora_probability"]))
     st.write("Forecast Time: {}".format(ret["forecast_time"]))
