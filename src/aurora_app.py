@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from scipy import spatial
 from os import environ
 from mapbox import Geocoder
+#import folium
 
 # Declare constants
 SCANDINAVIA_BBOX = (0.105400, 53.944367, 32.712822, 72.148786)
@@ -39,13 +40,15 @@ def split_list(lst):
     coords = []
     ratings = []
     for row in lst:
-        coords.append((row[0], row[1]))
+        # Coordinates as tuple (lat, long)
+        coords.append((row[1], row[0]))
+        # Ratings as probability in percentage
         ratings.append(row[2])
 
     return coords, ratings
 
 
-@st.cache
+@st.cache(show_spinner=False, persist=False, suppress_st_warning=True)
 def load_data(url):
     data = urlopen(url).read().decode()
     obj = json.loads(data)
@@ -58,19 +61,24 @@ def find_closest(position):
 
 
 # Download the aurora predictions and prepare for search
-aurora_data = load_data(AURORA_DATA_URL)
-aurora_coords, aurora_ratings = split_list(aurora_data["coordinates"])
-tree = spatial.KDTree(aurora_coords)
+with st.spinner(text='Getting data...'):
+    aurora_data = load_data(AURORA_DATA_URL)
+    aurora_coords, aurora_ratings = split_list(aurora_data["coordinates"])
+    tree = spatial.KDTree(aurora_coords)
 
 # Get the users location and convert to coordinates
 st.header("Enter your location")
 position_input = "Kiruna"
-position_query = st.text_area("Enter a place (ex Kiruna)", "Kiruna", height=50)
+position_query = st.text_input("Enter a place (ex Kiruna)", "Kiruna")
 
 position_properties = forward_geocode(position_query)
+st.write(position_properties)
 
+position_coordinates = tuple(reversed(position_properties["center"]))
+st.write(position_coordinates)
+#st.write(tuple(reversed(position_coordinates)))
 
-dist, index = tree.query(position_properties["center"])
+dist, index = tree.query(position_coordinates)
 ret = {
     "query": position_query,
     "query_result": position_properties["place_name"],

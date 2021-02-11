@@ -14,5 +14,5 @@ RUN pip install -r requirements.txt
 COPY src/ .
 
 # command to run on container start
-CMD python -m streamlit run aurora-app.py --server.port 80
+CMD python -m streamlit run aurora_app.py --server.port 80
 
