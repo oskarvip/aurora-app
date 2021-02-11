@@ -82,7 +82,7 @@ dist, index = tree.query(position_coordinates)
 ret = {
     "query": position_query,
     "query_result": position_properties["place_name"],
-    "position": position_properties["center"],
+    "position": position_coordinates,
     "distance": dist,
     "aurora_coords": aurora_coords[index],
     "observation_time": aurora_data["Observation Time"],
