@@ -5,7 +5,7 @@ echo "Starting up the aurora_app"
 docker run \
 --name aurora_app \
 --mount type=bind,source="$(pwd)"/src,target=/code \
---env-file "$(pwd)"/.env \
--p 8080:80 \
+-e MAPBOX_ACCESS_TOKEN \
+-p 8080:8080 \
 -d \
 aurora_app
